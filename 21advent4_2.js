@@ -25,15 +25,17 @@ const input = `7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3
  2  0 12  3  7`;
 
 const puzzle = input.split("\n");
-const drawnumbers = puzzle.slice(0, 1).flatMap(str => str.split(",")); //?
+const drawnumbers = puzzle.slice(0, 1).flatMap(str => str.split(","));
 const boardsinput = puzzle
   .slice(1)
   .filter(el => el !== "")
   .map(str => str.trim().split(" "))
   .map(arr => arr.filter(str => str !== ""));
-let boards = _.chunk(boardsinput, 5); //?
-let result;
-let winningnumber;
+let boards = _.chunk(boardsinput, 5);
+const totalboards = boards.length;
+let winningboards = [];
+let lastboard;
+let lastwinningnumber;
 
 function checkwinnerboard(board) {
   //check by row
@@ -53,6 +55,7 @@ function checkwinnerboard(board) {
       winner = true;
     }
   }
+
   return winner;
 }
 
@@ -70,20 +73,26 @@ loop: {
       )
     );
     //check for winner board
-    for (const bd of boards) {
+
+    for (let i = 0; i < boards.length; i++) {
+      const bd = boards[i];
       if (checkwinnerboard(bd)) {
-        result = bd;
-        winningnumber = Number(number);
-        break loop;
+        lastboard = bd;
+        lastwinningnumber = Number(number);
+        boards.splice(i, 1);
+        winningboards.push(bd);
+        if (totalboards === winningboards.length) {
+          break loop;
+        }
       }
     }
   }
 }
 
 console.log(
-  result
+  lastboard
     .flatMap(el => el)
     .filter(el => el !== "")
     .map(n => Number(n))
-    .reduce((acc, cur) => acc + cur) * winningnumber
-); //?
+    .reduce((acc, cur) => acc + cur) * lastwinningnumber //?
+);
